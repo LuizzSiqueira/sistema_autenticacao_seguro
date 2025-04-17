@@ -1,22 +1,20 @@
 import smtplib
-import random
-import string
-import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import random
+import string
 
-# Função para gerar um token temporário para recuperação de senha
-def generate_temp_password_token(length=6):
-    """Gera um token temporário para recuperação de senha."""
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+# E-mail e senha do app diretamente no código
+from_email = "central.seguranca.app@gmail.com"
+from_password = "iuhl pemq gurn mqls"
 
-# Função para enviar o e-mail de recuperação
 def send_recovery_email(to_email, temp_token):
-    """Envia um e-mail com um token temporário de recuperação de senha."""
-
-    from_email = os.getenv("EMAIL_ADDRESS", "seu_email@gmail.com")
-    from_password = os.getenv("EMAIL_PASSWORD", "sua_senha_do_email")  # Configure no .env
-
+    """Envia um e-mail com um link de recuperação para o usuário."""
+    
+    if not from_email or not from_password:
+        print("❌ E-mail ou senha de app não configurados corretamente.")
+        return
+    
     subject = "Recuperação de Senha"
     body = f"Para recuperar sua senha, use o token temporário: {temp_token}"
 
@@ -37,3 +35,9 @@ def send_recovery_email(to_email, temp_token):
         print(f"✅ E-mail enviado para {to_email} com o token de recuperação!")
     except Exception as e:
         print(f"❌ Falha ao enviar o e-mail: {str(e)}")
+
+def generate_temp_password_token():
+    """Gera um token temporário para recuperação de senha."""
+    # Gerando um token aleatório de 6 dígitos
+    token = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+    return token

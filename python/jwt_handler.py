@@ -1,9 +1,11 @@
 import jwt
 import datetime
+import os
 from functools import wraps
-from user import check_user_exists
+from python.user import check_user_exists
 
-SECRET_KEY = "supersecretkey"
+# Carregar a chave secreta do ambiente, se disponível
+SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")  # A chave secreta deve ser configurada em variáveis de ambiente para maior segurança
 
 # 1️⃣ Função para gerar o Access Token
 def generate_access_token(username):
@@ -26,9 +28,9 @@ def verify_access_token(token):
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         return payload['username']
     except jwt.ExpiredSignatureError:
-        return None
+        return None  # Token expirado
     except jwt.InvalidTokenError:
-        return None
+        return None  # Token inválido
 
 # 4️⃣ Função para verificar o Refresh Token
 def verify_refresh_token(token):
@@ -37,6 +39,30 @@ def verify_refresh_token(token):
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         return payload['username']
     except jwt.ExpiredSignatureError:
-        return None
+        return None  # Token expirado
     except jwt.InvalidTokenError:
-        return None
+        return None  # Token inválido
+
+# 5️⃣ Decorator para proteger funções que requerem autenticação
+def token_required(f):
+    """Decorator para verificar se o usuário está autenticado através do Access Token."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(" ")[1]  # Pega o token da requisição (Bearer <Token>)
+
+        if not token:
+            return {"message": "Token is missing!"}, 403
+
+        username = verify_access_token(token)
+        if not username:
+            return {"message": "Token is invalid or expired!"}, 403
+
+        # Verificar se o usuário existe no banco
+        if not check_user_exists(username):
+            return {"message": "User not found!"}, 403
+
+        return f(username, *args, **kwargs)
+    
+    return decorated_function

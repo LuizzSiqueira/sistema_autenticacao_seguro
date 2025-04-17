@@ -1,0 +1,22 @@
+import sqlite3
+
+def create_db():
+    """Cria o banco de dados e as tabelas necessárias."""
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+
+    # Criar tabela de usuários
+    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    email TEXT NOT NULL,
+    locked_until TEXT,
+    login_attempts INTEGER DEFAULT 0)''')
+    
+    conn.commit()
+    conn.close()
+    print("✅ Banco de dados e tabelas criados com sucesso!")
+
+if __name__ == "__main__":
+    create_db()
