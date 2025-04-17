@@ -2,20 +2,22 @@ import sqlite3
 
 def create_db():
     """Cria o banco de dados e as tabelas necessárias."""
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('users.db')  # Conectar ao banco de dados (ou criar se não existir)
     cursor = conn.cursor()
 
-    # Criar tabela de usuários
-    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    email TEXT NOT NULL,
-    locked_until TEXT,
-    login_attempts INTEGER DEFAULT 0)''')
+    # Criar tabela de usuários conforme o modelo atualizado
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        login_attempts INTEGER DEFAULT 0,
+        locked_until TEXT
+    )''')
     
-    conn.commit()
-    conn.close()
+    conn.commit()  # Confirmar a criação das tabelas
+    conn.close()  # Fechar a conexão com o banco de dados
     print("✅ Banco de dados e tabelas criados com sucesso!")
 
 if __name__ == "__main__":
