@@ -5,8 +5,8 @@ import random
 import string
 
 # E-mail e senha do app diretamente no código
-from_email = "central.seguranca.app@gmail.com"
-from_password = "iuhl pemq gurn mqls"
+from_email = "email@gmail.com"
+from_password = "Senha"
 
 def send_recovery_email(to_email, temp_token):
     """Envia um e-mail com um link de recuperação para o usuário."""
