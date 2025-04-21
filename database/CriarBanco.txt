@@ -1,0 +1,41 @@
+import sqlite3
+import os
+
+def create_db():
+    """Cria o banco de dados e as tabelas necessárias."""
+    db_path = os.path.join(os.path.dirname(__file__), '../database/users.db')
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # Criar tabela de usuários com a coluna created_at
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        login_attempts INTEGER DEFAULT 0,
+        locked_until TEXT,
+        created_at TEXT NOT NULL
+    )
+    ''')
+
+    # Criar tabela de logs para registrar toda movimentação do usuário
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        status TEXT NOT NULL,        
+        data_hora TEXT NOT NULL,
+        ip_origem TEXT
+    )
+    ''')
+
+    conn.commit()
+    conn.close()
+    print("✅ Banco de dados e tabelas criados com sucesso!")
+
+if __name__ == "__main__":
+    create_db()
