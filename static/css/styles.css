@@ -1,0 +1,142 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e6f0f5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* TOPO */
+.topo {
+    background-color: #4b6e91;
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* CONTEÚDO */
+.conteudo {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* MENU */
+.menu {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.menu a {
+    display: block;
+    background-color: #4b6e91;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 12px 20px;
+    margin: 12px 0;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.menu a:hover {
+    background-color: #3b5b75;
+}
+
+/* FORMULÁRIOS */
+.form {
+    background-color: #ffffff;
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    color: #4b6e91;
+}
+
+.form h2 {
+    color: #4b6e91;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+/* ÁREA DE INPUTS */
+.area {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.area label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+    font-size: 1rem;
+}
+
+.area input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: none;
+    border-bottom: 2px solid #4b6e91;
+    background: transparent;
+    color: #4b6e91;
+    outline: none;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.area input:focus {
+    border-color: #ffd700;
+}
+
+/* RODAPÉ DO FORMULÁRIO */
+.footer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.footer button {
+    width: 100%;
+    padding: 10px;
+    background-color: #ffaa00;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.footer button:hover {
+    background-color: #e69500;
+}
+
+.footer a {
+    font-size: 0.85rem;
+    color: #4b6e91;
+    opacity: 0.8;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+.footer a:hover {
+    opacity: 1;
+}
