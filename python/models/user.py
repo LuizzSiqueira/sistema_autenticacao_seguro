@@ -13,7 +13,7 @@ def check_user_exists(username):
     """Verifica se o usuário já existe no banco de dados."""
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
     conn.close()
     return user
@@ -22,7 +22,7 @@ def check_email_exists(email):
     """Verifica se o e-mail está associado a um usuário no banco de dados."""
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
     user = cursor.fetchone()
     conn.close()
     return user
@@ -35,10 +35,10 @@ def check_email_exists(email):
 def register_user(username, email, password):
     """Registra um novo usuário."""
     if check_user_exists(username):
-        print(f"❌ O nome de usuário '{username}' já está em uso.")
+        print(f"❌ O nome de usuário '{username}' já está em uso. Tente outro.")
         return
     if check_email_exists(email):
-        print(f"❌ O e-mail '{email}' já está em uso.")
+        print(f"❌ O e-mail '{email}' já está associado a outro usuário. Tente outro e-mail.")
         return
 
     salt = bcrypt.gensalt()
@@ -50,14 +50,13 @@ def register_user(username, email, password):
     conn = connect_db()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO users (username, email, password_hash, login_attempts, locked_until, created_at) VALUES (?, ?, ?, ?, ?, ?)", 
+        "INSERT INTO users (username, email, password_hash, login_attempts, locked_until, created_at) VALUES (%s, %s, %s, %s, %s, %s)", 
         (username, email, password_hash.decode('utf-8'), 0, None, created_at)
     )
     conn.commit()
     conn.close()
     registrar_log(username, "Usuário registrado com sucesso")
-    print(f"✅ Usuário '{username}' registrado com sucesso!")
-
+    print(f"✅ Usuário '{username}' registrado com sucesso! Agora, você pode fazer login.")
 
 
 # ============================
@@ -69,14 +68,14 @@ def login_user(username, password):
     conn = connect_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
     conn.close()
 
     if user:
         # Verifica bloqueio
         if user[5] and datetime.strptime(user[5], "%Y-%m-%d %H:%M:%S") > datetime.now():
-            print(f"❌ Sua conta está bloqueada até {user[5]}.")
+            print(f"❌ Sua conta está bloqueada até {user[5]}. Tente novamente depois dessa data.")
             return
 
         stored_password_hash = user[3]
@@ -86,25 +85,24 @@ def login_user(username, password):
             registrar_log(username, "Login bem-sucedido")
             reset_login_attempts(username)
         else:
-            print("❌ Senha incorreta!")
+            print("❌ Senha incorreta! Tente novamente.")
             registrar_log(username, "Senha incorreta")
             increment_login_attempts(username)
     else:
-        print("❌ Usuário não encontrado!")
-        registrar_log(username, "Usuário não encontrado")
+        print("❌ Usuário não encontrado! Verifique o nome de usuário e tente novamente.")
 
 
 def increment_login_attempts(username):
     """Incrementa tentativas de login e bloqueia se atingir o limite."""
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT login_attempts FROM users WHERE username = ?", (username,))
+    cursor.execute("SELECT login_attempts FROM users WHERE username = %s", (username,))
     login_attempts = cursor.fetchone()[0]
 
     if login_attempts >= 4:
         lock_account(username)
     else:
-        cursor.execute("UPDATE users SET login_attempts = ? WHERE username = ?", (login_attempts + 1, username))
+        cursor.execute("UPDATE users SET login_attempts = %s WHERE username = %s", (login_attempts + 1, username))
     
     conn.commit()
     conn.close()
@@ -115,19 +113,19 @@ def lock_account(username):
     conn = connect_db()
     cursor = conn.cursor()
     locked_until = datetime.now() + timedelta(minutes=10)
-    cursor.execute("UPDATE users SET locked_until = ? WHERE username = ?", 
+    cursor.execute("UPDATE users SET locked_until = %s WHERE username = %s", 
                    (locked_until.strftime("%Y-%m-%d %H:%M:%S"), username))
     conn.commit()
     conn.close()
-    registrar_log(username, "Conta bloqueada por 10 minutos")
-    print("❌ Sua conta foi bloqueada por 10 minutos devido a múltiplas tentativas falhas.")
+    registrar_log(username, "Conta bloqueada por 10 minutos devido a falhas de login")
+    print("❌ Sua conta foi bloqueada por 10 minutos. Tente novamente após esse tempo.")
 
 
 def reset_login_attempts(username):
     """Reseta tentativas de login e desbloqueia o usuário."""
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET login_attempts = 0, locked_until = NULL WHERE username = ?", (username,))
+    cursor.execute("UPDATE users SET login_attempts = 0, locked_until = NULL WHERE username = %s", (username,))
     conn.commit()
     conn.close()
 
@@ -141,11 +139,11 @@ def recover_password(username, email):
     if check_email_exists(email):
         token = generate_temp_password_token()
         send_recovery_email(email, token)
-        print("✅ Token de recuperação enviado com sucesso!")
-        registrar_log(username, "Token de recuperação enviado")
+        print("✅ Um token de recuperação foi enviado para o seu e-mail.")
+        registrar_log(username, "Token de recuperação enviado com sucesso")
         return token
     else:
-        print("❌ E-mail não encontrado!")
+        print("❌ E-mail não encontrado. Verifique o e-mail associado à sua conta.")
         registrar_log(username, "Tentativa de recuperação com e-mail inválido")
         return None
 
@@ -157,12 +155,12 @@ def update_password(username, new_password, token_entered, valid_token):
         password_hash = bcrypt.hashpw(new_password.encode('utf-8'), salt)
         conn = connect_db()
         cursor = conn.cursor()
-        cursor.execute("UPDATE users SET password_hash = ? WHERE username = ?", 
+        cursor.execute("UPDATE users SET password_hash = %s WHERE username = %s", 
                        (password_hash.decode('utf-8'), username))
         conn.commit()
         conn.close()
-        print(f"✅ Senha de '{username}' atualizada com sucesso!")
+        print(f"✅ A senha de '{username}' foi alterada com sucesso!")
         registrar_log(username, "Senha alterada com sucesso")
     else:
-        print("❌ Token inválido. Tente novamente.")
+        print("❌ Token inválido. Tente novamente com o token correto.")
         registrar_log(username, "Tentativa de redefinição com token inválido")

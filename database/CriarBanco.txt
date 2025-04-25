@@ -1,41 +1,39 @@
-import sqlite3
-import os
+# 📦 Conexão com Banco de Dados Online (Supabase)
 
-def create_db():
-    """Cria o banco de dados e as tabelas necessárias."""
-    db_path = os.path.join(os.path.dirname(__file__), '../database/users.db')
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+> Este projeto já está configurado para conexão com um banco PostgreSQL hospedado na Supabase.
 
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+## 🔗 String de Conexão
+A string de conexão utilizada está no seguinte formato:
 
-    # Criar tabela de usuários com a coluna created_at
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        email TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        login_attempts INTEGER DEFAULT 0,
-        locked_until TEXT,
-        created_at TEXT NOT NULL
-    )
-    ''')
+```python
+postgresql://USUARIO:SENHA@HOST:PORTA/NOME_DO_BANCO
+```
 
-    # Criar tabela de logs para registrar toda movimentação do usuário
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL,
-        status TEXT NOT NULL,        
-        data_hora TEXT NOT NULL,
-        ip_origem TEXT
-    )
-    ''')
+Exemplo real usado no projeto:
+```python
+postgresql://postgres.hmrmyszfvftjcqmvpdym:pI15WkDX9cm6P6sV@aws-0-us-east-2.pooler.supabase.com:6543/postgres
+```
 
-    conn.commit()
-    conn.close()
-    print("✅ Banco de dados e tabelas criados com sucesso!")
+## 📂 Onde está configurado?
+O arquivo responsável pela conexão é:
 
-if __name__ == "__main__":
-    create_db()
+```python
+python/db/db.py
+```
+
+## 🛠️ Função principal
+
+```python
+def connect_db():
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        print("Conexão bem-sucedida ao banco de dados.")
+        return conn
+    except psycopg2.Error as e:
+        print(f"Erro ao conectar ao banco de dados: {e}")
+        return None
+```
+
+## ⚠️ Observações
+- Certifique-se de que a porta `6543` esteja aberta e que a senha do banco não tenha sido alterada.
+- Em caso de erro, verifique sua string de conexão ou as permissões da tabela no Supabase.
