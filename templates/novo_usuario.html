@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <title>Sistema de autenticação</title>
+</head>
+<body>
+    <header class="topo">
+        <h1>🔐 Bem-vindo ao sistema de autenticação!</h1>
+    </header>
+    <main class="conteudo">
+        <div class="form">
+            <form action="" method="post">
+                <h2>Novo usuário</h2>
+                <br>
+                <div class="area">
+                    <label for="username">👤 Digite seu usuário: </label>
+                    <input type="text" name="username" id="username" autocomplete="off" required>
+                </div>
+                <br>
+                <div class="area">
+                    <label for="email">📧 Digite seu e-mail: </label>
+                    <input type="email" name="email" id="email" autocomplete="off" required>
+                </div>
+                <br>
+                <div class="area">
+                    <label for="password">🔒 Digite uma senha: </label>
+                    <input type="password" name="password" id="password" autocomplete="off" required>
+                </div>
+                <br>
+                <div class="footer">
+                    <button type="submit">Registrar</button>
+                    <a href="javascript:history.back()">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

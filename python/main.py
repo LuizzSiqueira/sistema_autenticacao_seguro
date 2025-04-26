@@ -1,6 +1,6 @@
 import sys
 import os
-import bcrypt
+from flask import Flask, render_template, request, redirect, url_for, flash
 from getpass import getpass
 
 # Adiciona o diretório raiz do projeto ao sys.path para evitar erro de importação
@@ -11,72 +11,89 @@ from python.models.user import (
     recover_password, update_password
 )
 
-def menu():
-    """Exibe o menu principal e retorna a escolha do usuário."""
-    print("\n🔐 Bem-vindo ao sistema de autenticação!")
-    print("1 - Registrar novo usuário")
-    print("2 - Fazer login")
-    print("3 - Recuperar senha")
-    print("0 - Sair")
-    
-    opcao = input("Digite o número da opção desejada: ").strip()
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
+app.secret_key = os.urandom(24)  # Necessário para flash messages
 
-    if opcao not in ['0', '1', '2', '3']:
-        print("❌ Opção inválida! Por favor, escolha 1, 2, 3 ou 0.")
-        return None
-    
-    return opcao
+@app.route('/')
+def index():
+    """Página inicial do sistema de autenticação."""
+    return render_template('index.html')
 
-def executar_acao(opcao):
-    """Executa a ação com base na opção do usuário."""
-    if opcao == '0':
-        return
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Página de login do usuário."""
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        if not username or not password:
+            flash("❌ Nome de usuário e senha são obrigatórios!")
+            return redirect(url_for('login'))
 
-    username = input("👤 Digite seu nome de usuário: ").strip()
-    if not username:
-        print("❌ Nome de usuário não pode estar vazio.")
-        return
-
-    if opcao == '1':  # Registrar novo usuário
-        if check_user_exists(username):
-            print(f"❌ O nome de usuário '{username}' já está em uso.")
-        else:
-            email = input("📧 Digite seu e-mail: ").strip()
-            if not email:
-                print("❌ O e-mail não pode estar vazio.")
-                return
-
-            password = getpass("🔒 Digite uma senha: ")
-            register_user(username, email, password)
-
-    elif opcao == '2':  # Fazer login
-        password = getpass("🔑 Digite sua senha: ")
         login_user(username, password)
+        flash("✅ Login realizado com sucesso!")
+        return redirect(url_for('index'))  # Redireciona para a página inicial após login
 
-    elif opcao == '3':  # Recuperar senha
-        email = input("📧 Digite seu e-mail para recuperação de senha: ").strip()
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """Página de registro de novo usuário."""
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+
+        if not username or not email or not password:
+            flash("❌ Todos os campos são obrigatórios!")
+            return redirect(url_for('register'))
+
+        if check_user_exists(username):
+            flash(f"❌ O nome de usuário '{username}' já está em uso.")
+            return redirect(url_for('register'))
+
+        register_user(username, email, password)
+        flash("✅ Registro realizado com sucesso!")
+        return redirect(url_for('login'))  # Redireciona para a página de login após o registro
+
+    return render_template('novo_usuario.html')
+
+@app.route('/recover', methods=['GET', 'POST'])
+def recover():
+    """Página de recuperação de senha."""
+    if request.method == 'POST':
+        email = request.form['email']
+        
         if not email:
-            print("❌ O e-mail não pode estar vazio.")
-            return
+            flash("❌ O e-mail é obrigatório para recuperação!")
+            return redirect(url_for('recover'))
 
-        token = recover_password(username, email)
+        token = recover_password(None, email)  # Supondo que o nome de usuário não seja necessário aqui
         if token:
-            token_entered = input("Digite o token recebido no seu e-mail: ").strip()
-            new_password = getpass("Digite sua nova senha: ")
-            update_password(username, new_password, token_entered, token)
+            flash("✅ Token enviado para o seu e-mail!")
+            return redirect(url_for('reset_password', token=token))  # Redireciona para redefinir a senha
+        else:
+            flash("❌ Não foi possível enviar o token. Verifique seu e-mail.")
+            return redirect(url_for('recover'))
 
-def main():
-    """Função principal para o fluxo do sistema."""
-    while True:
-        try:
-            opcao = menu()
-            if opcao == '0':
-                print("👋 Saindo... Até logo!")
-                break
-            if opcao is not None:
-                executar_acao(opcao)
-        except Exception as e:
-            print(f"⚠️ Ocorreu um erro: {e}")
+    return render_template('recupera_senha.html')
 
-if __name__ == "__main__":
-    main()
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    """Página para redefinir a senha após recuperação."""
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        username = request.form['username']
+        
+        if not new_password or not username:
+            flash("❌ Nome de usuário e nova senha são obrigatórios!")
+            return redirect(url_for('reset_password', token=token))
+
+        update_password(username, new_password, token, token)
+        flash("✅ Senha atualizada com sucesso!")
+        return redirect(url_for('login'))  # Redireciona para login após atualização de senha
+
+    return render_template('redefinir_senha.html', token=token)
+
+if __name__ == '__main__':
+    app.run(debug=True)

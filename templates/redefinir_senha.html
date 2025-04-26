@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <title>Redefinir Senha - Sistema de autenticação</title>
+</head>
+<body>
+    <header class="topo">
+        <h1>🔐 Redefinir sua senha</h1>
+    </header>
+    <main class="conteudo">
+        <div class="form">
+            <form action="" method="post">
+                <h2>Informe seus dados</h2>
+                <br>
+                <div class="area">
+                    <label for="username">👤 Usuário:</label>
+                    <input type="text" name="username" id="username" autocomplete="off" required>
+                </div>
+                <br>
+                <div class="area">
+                    <label for="token">🔑 Token recebido:</label>
+                    <input type="text" name="token" id="token" autocomplete="off" required>
+                </div>
+                <br>
+                <div class="area">
+                    <label for="new_password">🔒 Nova senha:</label>
+                    <input type="password" name="new_password" id="new_password" autocomplete="off" required>
+                </div>
+                <br>
+                <div class="area">
+                    <label for="confirm_password">🔒 Confirmar nova senha:</label>
+                    <input type="password" name="confirm_password" id="confirm_password" autocomplete="off" required>
+                </div>
+                <br>
+                <div class="footer">
+                    <button type="submit">Redefinir senha</button>
+                    <a href="javascript:history.back()">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

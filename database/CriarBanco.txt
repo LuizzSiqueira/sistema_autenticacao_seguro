@@ -9,11 +9,6 @@ A string de conexão utilizada está no seguinte formato:
 postgresql://USUARIO:SENHA@HOST:PORTA/NOME_DO_BANCO
 ```
 
-Exemplo real usado no projeto:
-```python
-postgresql://postgres.hmrmyszfvftjcqmvpdym:pI15WkDX9cm6P6sV@aws-0-us-east-2.pooler.supabase.com:6543/postgres
-```
-
 ## 📂 Onde está configurado?
 O arquivo responsável pela conexão é:
 
