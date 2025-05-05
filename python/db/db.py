@@ -4,7 +4,7 @@ from datetime import datetime
 import socket
 
 # Link de conexão com o Transaction Pooler
-DB_URI = 'link do banco de dados'
+DB_URI = 'postgresql://postgres.hmrmyszfvftjcqmvpdym:pI15WkDX9cm6P6sV@aws-0-us-east-2.pooler.supabase.com:6543/postgres'
 def connect_db():
     """Conecta ao banco de dados PostgreSQL no Supabase usando o Transaction Pooler."""
     try:

@@ -1,0 +1,25 @@
+<!-- templates/permissoes.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar Permissões</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Gerenciar Permissões</h1>
+    
+    <form method="POST" action="{{ url_for('permissoes') }}">
+        <label for="usuario">Nome do Usuário:</label><br>
+        <input type="text" id="usuario" name="usuario" required><br><br>
+
+        <label for="permissao">Nova Permissão:</label><br>
+        <input type="text" id="permissao" name="permissao" required><br><br>
+
+        <button type="submit">Adicionar Permissão</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('index') }}">⬅️ Voltar para a Página Inicial</a>
+</body>
+</html>

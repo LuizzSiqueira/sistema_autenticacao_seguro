@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel de {{ username }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <!-- TOPO -->
+    <div class="topo">
+        <h1>🔐 Painel de {{ username }}</h1>
+        <p>Veja e execute suas permissões disponíveis</p>
+    </div>
+
+    <!-- CONTEÚDO CENTRALIZADO -->
+    <div class="conteudo">
+        <div class="form">
+
+            <h2>🔎 Permissões do usuário</h2>
+
+            {% if permissoes %}
+                <ul style="list-style: none; padding: 0; margin: 20px 0;">
+                    {% for p in permissoes %}
+                        <li style="margin: 8px 0; color: #4b6e91;">✔️ {{ p }}</li>
+                    {% endfor %}
+                </ul>
+
+                <form method="POST" action="{{ url_for('executar_permissao') }}">
+                    <div class="area">
+                        <label for="permissao">🎯 Escolha uma permissão:</label>
+                        <select name="permissao" id="permissao"
+                            style="width: 100%; padding: 10px; margin-top: 8px; border: 1px solid #4b6e91; border-radius: 8px; font-size: 1rem;">
+                            {% for p in permissoes %}
+                                <option value="{{ p }}">{{ p }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="footer">
+                        <button type="submit">Executar</button>
+                        <a href="{{ url_for('logout') }}">🔚 Sair</a>
+                    </div>
+                </form>
+            {% else %}
+                <p style="color: #cc0000; font-weight: bold; margin: 20px 0;">⚠️ Nenhuma permissão atribuída.</p>
+                <div class="footer">
+                    <a href="{{ url_for('logout') }}">🔚 Sair</a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+</body>
+</html>
